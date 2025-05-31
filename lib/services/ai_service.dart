@@ -26,10 +26,17 @@ class AiService with ChangeNotifier {
   Future<String?> fetchAiResult(String userMessage) async {
     print("islem başladı");
     final apiKey = dotenv.env['OPENROUTER_API_KEY'];
+    final modelName = dotenv.env['OPENROUTER_MODEL'] ?? "";
+    final promptTemplate = dotenv.env['PROMPT_TEMPLATE'] ??"";
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception("API anahtarı eksik!");
     }
 
+    // Prompt template içindeki değişkenleri doldur
+    final promptContent = promptTemplate
+        .replaceAll('{language}', aiModel.language)
+        .replaceAll('{contentType}', aiModel.selectedContentType.toString())
+        .replaceAll('{prompt}', userMessage);
 
     try {
       final response = await http.post(
@@ -39,18 +46,11 @@ class AiService with ChangeNotifier {
           "Content-Type": "application/json",
         },
         body: jsonEncode({
-          "model": "meta-llama/llama-4-maverick:free",
+          "model": modelName,
           "messages": [
             {
               "role": "user",
-              "content":
-                  """Belirtilen promptu dil ve içerik türüne göre daha güzel bir prompt haline geitr . Aşağıda dil, içerik türü ve prompt içeriği mevcut doğru cevabı alacak güncellenmiş promptu ver.
-
-Dil: ${aiModel.language}
-İçerik Türü: ${aiModel.selectedContentType}
-Prompt: ${userMessage}
-
-Çıktıda sadece güncellenmiş promptu ver promptu ver"""
+              "content": promptContent
             }
           ],
         }),
