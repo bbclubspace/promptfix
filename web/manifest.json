@@ -1,6 +1,6 @@
 {
-    "name": "ai_prompt_duzenleyici",
-    "short_name": "ai_prompt_duzenleyici",
+    "name": "promptfix",
+    "short_name": "promptfix",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",

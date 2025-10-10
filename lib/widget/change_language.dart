@@ -1,4 +1,4 @@
-import 'package:ai_prompt_duzenleyici/themes/app_colors.dart';
+import 'package:promptfix/themes/app_colors.dart';
 import 'package:flutter/material.dart';
 import '../services/ai_service.dart';
 

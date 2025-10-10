@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import '../../services/ai_service.dart';
 import '../../themes/app_colors.dart';
 import '../button/copy_button.dart';
+import 'package:flutter/services.dart';
 
 class ResultContainer extends StatelessWidget {
   const ResultContainer({
@@ -10,8 +11,8 @@ class ResultContainer extends StatelessWidget {
     required this.aiService,
   });
 
-  final bool isDark;
   final AiService aiService;
+  final bool isDark;
 
   @override
   Widget build(BuildContext context) {
@@ -32,9 +33,20 @@ class ResultContainer extends StatelessWidget {
               aiService.aiModel.result,
               style: const TextStyle(fontSize: 15),
               textAlign: TextAlign.left,
+              maxLines: 4,
             ),
           ),
-          CopyButton(isDark: isDark),
+          CopyButton(
+            isDark: isDark,
+            onTap: () {
+              Clipboard.setData(
+                ClipboardData(text: aiService.aiModel.result),
+              );
+              ScaffoldMessenger.of(context).showSnackBar(
+               const SnackBar(content: Text('Sonuç panoya kopyalandı')),
+              );
+            },
+          ),
         ],
       ),
     );

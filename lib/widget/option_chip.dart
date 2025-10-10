@@ -1,6 +1,6 @@
-import 'package:ai_prompt_duzenleyici/themes/app_colors.dart';
+import 'package:promptfix/themes/app_colors.dart';
 import 'package:flutter/material.dart';
-import 'package:ai_prompt_duzenleyici/model/ai_model.dart';
+import 'package:promptfix/model/ai_model.dart';
 import '../services/ai_service.dart';
 
 class OptionChip extends StatelessWidget {

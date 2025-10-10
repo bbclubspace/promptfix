@@ -1,3 +1,3 @@
-# ai_prompt_duzenleyici
+# promptfix
 
 A new Flutter project.

@@ -17,6 +17,8 @@ class PromptTextField extends StatelessWidget {
     return Expanded(
       child: TextField(
         controller: promptController,
+        maxLines: null,
+        keyboardType: TextInputType.multiline,
         decoration: const InputDecoration(
           hintText: "Promptunu gir",
           border: InputBorder.none,

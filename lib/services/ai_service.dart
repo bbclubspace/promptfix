@@ -1,11 +1,13 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
-import 'package:ai_prompt_duzenleyici/model/ai_model.dart';
+import 'package:promptfix/model/ai_model.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class AiService with ChangeNotifier {
   AiModel aiModel = AiModel();
+  int adsCounter = 0;
 
   void updatePrompt(String prompt) {
     aiModel.prompt = prompt;
@@ -23,16 +25,42 @@ class AiService with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateAdsCounter() {
+    adsCounter = adsCounter + 1;
+    saveAdsCounter();
+    notifyListeners();
+  }
+
+  void resetAdsCounter() {
+    adsCounter = 0;
+    saveAdsCounter();
+    notifyListeners();
+  }
+
+  Future<void> saveAdsCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('adsCounter', adsCounter);
+  }
+
+  Future<void> loadAdsCounter() async {
+    final prefs = await SharedPreferences.getInstance();
+    adsCounter = prefs.getInt('adsCounter') ?? 0;
+    notifyListeners();
+  }
+
   Future<String?> fetchAiResult(String userMessage) async {
-    print("islem başladı");
+    debugPrint("islem başladı");
+
+    updateAdsCounter();
+    if (adsCounter == 5) resetAdsCounter();
+
     final apiKey = dotenv.env['OPENROUTER_API_KEY'];
     final modelName = dotenv.env['OPENROUTER_MODEL'] ?? "";
-    final promptTemplate = dotenv.env['PROMPT_TEMPLATE'] ??"";
+    final promptTemplate = dotenv.env['PROMPT_TEMPLATE'] ?? "";
     if (apiKey == null || apiKey.isEmpty) {
       throw Exception("API anahtarı eksik!");
     }
 
-    // Prompt template içindeki değişkenleri doldur
     final promptContent = promptTemplate
         .replaceAll('{language}', aiModel.language)
         .replaceAll('{contentType}', aiModel.selectedContentType.toString())
@@ -50,9 +78,11 @@ class AiService with ChangeNotifier {
           "messages": [
             {
               "role": "user",
-              "content": promptContent
+              "content": [
+                {"type": "text", "text": promptContent}
+              ]
             }
-          ],
+          ]
         }),
       );
 
@@ -62,13 +92,13 @@ class AiService with ChangeNotifier {
 
       final decodedBody = utf8.decode(response.bodyBytes);
       final data = jsonDecode(decodedBody);
-      print("AI Response: $decodedBody");
+      debugPrint("AI Response: $decodedBody");
       aiModel.result = data['choices'][0]['message']['content'];
-      aiModel.isResultget=true;
+      aiModel.isResultget = true;
       notifyListeners();
       return aiModel.result;
     } catch (e) {
-      print('Hata oluştu: $e');
+      debugPrint('Hata oluştu: $e');
       return null;
     }
   }

@@ -1,4 +1,4 @@
-package com.example.ai_prompt_duzenleyici
+package com.bbclub.promptfix
 
 import io.flutter.embedding.android.FlutterActivity
 
